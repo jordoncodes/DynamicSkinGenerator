@@ -1,5 +1,5 @@
-# SkinChanger
-### This is a proof of concept for changing the pixels of a skin dynamically in a spigot plugin.
+# DynamicSkinGenerator
+### This is (currently) a proof of concept for changing the pixels of a skin dynamically in a spigot plugin.
 ### dependencies: [nicknamer api](https://github.com/jordoncodes/nicknamer-api)
 
 ### How to use:
