@@ -1,0 +1,5 @@
+name: ChangeSkin
+version: '${project.version}'
+main: me.onlyjordon.changeskin.ChangeSkin
+api-version: '1.20'
+depend: [nicknamer-api]
