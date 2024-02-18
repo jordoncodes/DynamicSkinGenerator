@@ -1,4 +1,4 @@
-name: ChangeSkin
+name: DynamicSkinGenerator
 version: '${project.version}'
 main: me.onlyjordon.changeskin.ChangeSkin
 api-version: '1.20'
