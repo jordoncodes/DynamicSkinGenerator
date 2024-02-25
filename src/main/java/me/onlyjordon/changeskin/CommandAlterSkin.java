@@ -2,18 +2,22 @@ package me.onlyjordon.changeskin;
 
 import me.onlyjordon.changeskin.commands.PlayerOnlyCommand;
 import me.onlyjordon.changeskin.util.ColorUtils;
+import me.onlyjordon.changeskin.util.SkinColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.color.ColorSpace;
-import java.awt.color.ICC_ColorSpace;
-import java.awt.color.ICC_Profile;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CommandAlterSkin extends PlayerOnlyCommand {
     public CommandAlterSkin() {
@@ -27,25 +31,28 @@ public class CommandAlterSkin extends PlayerOnlyCommand {
     @Override
     protected boolean execute(Player player, String[] args) {
         if (args == null) return false;
-        ChangeSkin gen = ChangeSkin.getPlugin(ChangeSkin.class);
-        if (args.length > 1) {
-            Color first = Color.decode(args[0]);
-            Color second = Color.decode(args[1]);
-            try {
+
+        int argb1 = 0xFF00FF00;
+        int argb2 = 0x7F0000FF;
+
+        TextComponent component = Component.text("■").color(TextColor.color(argb1))
+                .append(Component.text("■").color(TextColor.color(ColorUtils.blendBetweenTwoColors(argb1, argb2).getRGB())))
+                .append(Component.text("■").color(TextColor.color(argb2)));
+        player.sendMessage(LegacyComponentSerializer.legacySection().serialize(component));
 
 
+        try {
+            ChangeSkin gen = ChangeSkin.getPlugin(ChangeSkin.class);
+            List<ImageLayer> layers = ImageLayer.layersFromFolder(new File(gen.getDataFolder().getAbsolutePath()+File.separator+"skins"+File.separator+"baby"));
+//            SkinColor color = SkinColor.random();
+//            layers.forEach((l) -> l.setImage(ColorUtils.colorImage(l.getImage(), color.getMap())));
+            ImageLayer merged = ImageLayer.merge(layers);
 
-                BufferedImage originalSkin = ImageIO.read(gen.getOriginalSkinFile());;
-                BufferedImage alteredSkin = ColorUtils.colorImage(originalSkin, first, second);
-                gen.setAlteredSkinFile(new File(gen.getDataFolder(), "skins/alteredSkin.png"));
-                ImageIO.write(alteredSkin, "png", gen.getAlteredSkinFile());
-                player.sendMessage("Skin has been altered!");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-
-            player.sendMessage("Please provide a color to change the skin to!");
+            gen.setAlteredSkinFile(new File(gen.getDataFolder(), "skins/alteredSkin.png"));
+            ImageIO.write(merged.getImage(), "png", gen.getAlteredSkinFile());
+            player.sendMessage("Skin has been altered!");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         return true;
     }
